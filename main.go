@@ -47,6 +47,13 @@ type handler struct {
 }
 
 func (h *handler) list(c echo.Context) error {
+	conn := h.mongo.Copy()
+	defer conn.Close()
+	var ts []todo
+	if err := conn.DB(h.db).C(h.col).Find(nil).All(&ts); err != nil {
+		return err
+	}
+	c.JSON(http.StatusOK, ts)
 	return nil
 }
 
