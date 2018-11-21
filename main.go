@@ -1,16 +1,30 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/globalsign/mgo"
 	"github.com/globalsign/mgo/bson"
 	"github.com/labstack/echo"
+	"github.com/spf13/viper"
 )
 
 func main() {
-	connString := "root:example@localhost"
+	viper.SetConfigType("yaml")
+	viper.SetConfigName("config")
+	viper.AddConfigPath(".")
+	viper.ReadInConfig()
+
+	viper.SetDefault("port", "8080")
+
+	mongoHost := viper.GetString("mongo.host")
+	mongoUser := viper.GetString("mongo.user")
+	mongoPass := viper.GetString("mongo.pass")
+	port := fmt.Sprintf(":%v", viper.GetString("port"))
+
+	connString := fmt.Sprintf("%v:%v@%v", mongoUser, mongoPass, mongoHost)
 	conn, err := mgo.Dial(connString)
 	if err != nil {
 		log.Printf("dial mongodb server with connection string %q: %v", connString, err)
@@ -31,7 +45,7 @@ func main() {
 	e.PUT("/todos/:id", h.done)
 	e.DELETE("/todos/:id", h.remove)
 
-	e.Logger.Fatal(e.Start(":8080"))
+	e.Logger.Fatal(e.Start(port))
 }
 
 type todo struct {
