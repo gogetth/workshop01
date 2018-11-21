@@ -90,6 +90,19 @@ func (h *handler) create(c echo.Context) error {
 }
 
 func (h *handler) done(c echo.Context) error {
+	conn := h.mongo.Copy()
+	defer conn.Close()
+	var t todo
+	id := bson.ObjectIdHex(c.Param("id"))
+
+	if err := conn.DB(h.db).C(h.col).FindId(id).One(&t); err != nil {
+		return err
+	}
+	t.Done = true
+	if err := conn.DB(h.db).C(h.col).UpdateId(id, t); err != nil {
+		return err
+	}
+	c.JSON(http.StatusOK, t)
 	return nil
 }
 
