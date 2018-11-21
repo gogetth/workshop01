@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/globalsign/mgo"
 	"github.com/globalsign/mgo/bson"
@@ -16,6 +17,8 @@ func main() {
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
 	viper.ReadInConfig()
+	viper.AutomaticEnv()
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
 	viper.SetDefault("port", "8080")
 
