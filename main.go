@@ -58,6 +58,15 @@ func (h *handler) list(c echo.Context) error {
 }
 
 func (h *handler) view(c echo.Context) error {
+	conn := h.mongo.Copy()
+	defer conn.Close()
+	var t todo
+	id := bson.ObjectIdHex(c.Param("id"))
+
+	if err := conn.DB(h.db).C(h.col).FindId(id).One(&t); err != nil {
+		return err
+	}
+	c.JSON(http.StatusOK, t)
 	return nil
 }
 
