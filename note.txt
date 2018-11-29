@@ -1,0 +1,13 @@
+heroku login
+heroku create
+heroku config:set MONGO_HOST=13.250.119.252
+heroku config:set MONGO_USER=root
+heroku config:set MONGO_PASS=example
+
+# for git deploy
+git push --set-upstream heroku master
+
+# for container deploy
+heroku container:login
+heroku container:push web
+heroku container:release web
